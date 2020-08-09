@@ -40,6 +40,24 @@ class Player:
                 ace_counter -= 1
         return self.score
 
-player1 = Player(['A♣', 'A♠', 'A♢'], 200)
-player1.set_score()
+        def hit(self, card):
+            self.hand.append(card)
+            self.score = self.set_score()
+
+        def play(self, new_hand):
+            self.hand = new_hand
+            self.score = self.set_score()
+
+        def pay(self, amount):
+            self.money -= amount
+
+        def win(self, amount):
+            self.money += amount
+
+player1 = Player(['3♣', '7♠', '5♢'], 200)
+player1.hit('K♢')
+player1.pay(20)
+player1.win(40)
+player1.play(['A♠', 'K♢'])
 print(player1)
+print(player1.money)
