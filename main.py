@@ -58,25 +58,97 @@ class Player:
                 self.money += 2 * self.bet_amount
         self.bet_amount = 0
 
+    def draw(self):
+        self.money += self.bet_amount
+        self.bet_amount = 0
+
+    def has_black_jack(self):
+        return (self.score == 21 and len(self.hand) == 2)
+
 def print_house(house):
     house_copy = house.hand[:]
     house_copy[0] = 'X';
-    print(f'{", ".join(house_copy)}')
+    print(f'House: {", ".join(house_copy)}')
 
 card_deck = create_deck()
 first_hand = [card_deck.pop(), card_deck.pop()]
 second_hand = [card_deck.pop(), card_deck.pop()]
 player1 = Player(first_hand)
 house = Player(second_hand)
-print(card_deck)
-print_house(house)
-print(player1)
-
-while(player1.score < 21):
-    action = input('Do you want to pick another card?(y/n): ')
-    if action.lower()[0] == 'y':
-        player1.hit(card_deck.pop())
-        print(player1)
-        print_house(house)
+card_deck = create_deck()
+while True:
+    if len(card_deck) < 20:
+        card_deck = create_deck()
+    first_hand = [card_deck.pop(), card_deck.pop()]
+    second_hand = [card_deck.pop(), card_deck.pop()]
+    player1.play(first_hand)
+    house.play(second_hand)
+    bet = int(input('Please enter the amount you want to bet: '))
+    if bet <= player1.money:
+        player1.bet(bet)
     else:
+        print(f'Entered amount is greater than the money in your wallet. Total money {player1.money}')
+        continue
+    print(card_deck)
+    print_house(house)
+    print(player1)
+
+    if player1.has_black_jack():
+        if house.has_black_jack():
+            player1.draw()
+            print('Game is draw as both player and house has a black jack')
+            print(f'Total amount with player1 after the game: {player1.money}')
+        else:
+            player1.win(True)
+            print('Player1 won the game, since it has black jack')
+            print(f'Total amount with player1 after the game: {player1.money}')
+    elif house.has_black_jack():
+        player1.win(False)
+        print('Player1 lost the game, house has a blackjack')
+        print(f'Total amount with player1 after the game: {player1.money}')
+    else:
+        while(player1.score < 21):
+            action = input('Do you want to pick another card?(y/n): ')
+            if action.lower()[0] == 'y':
+                player1.hit(card_deck.pop())
+                print(f'Player1 {player1}')
+                print_house(house)
+            else:
+                break
+
+        while house.score < 16:
+            house.hit(card_deck.pop())
+            print_house(house)
+
+        if player1.score > 21:
+            if house.score > 21:
+                player1.draw()
+                print('Game is draw as both player and house had equal score')
+                print(f'Total amount with player1 after the game: {player1.money}')
+            else:
+                player1.win(False)
+                print(f'Player1 lost the game, house score was: {house.score}')
+                print(f'Total amount with player1 after the game: {player1.money}')
+        elif player1.score == house.score:
+            player1.draw()
+            print('Game is draw as both player and house had equal score')
+            print(f'Total amount with player1 after the game: {player1.money}')
+        elif player1.score > house.score:
+            player1.win(True)
+            print(f'Player1 won the game, house score was: {house.score}')
+            print(f'Total amount with player1 after the game: {player1.money}')
+        else:
+            if house.score > 21:
+                player1.win(True)
+                print('Player1 won the game, house score was above 21')
+                print(f'Total amount with player1 after the game: {player1.money}')
+            else:
+                player1.win(False)
+                print(f'Player1 lost the game, house score was: {house.score}')
+                print(f'Total amount with player1 after the game: {player1.money}')
+
+    wants_to_continue = input('You want to continue playing?(y/n): ')
+    if wants_to_continue.lower()[0] != 'y':
         break
+
+print(f'Total amount with player 1 after the game: {player1.money}')
