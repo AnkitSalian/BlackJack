@@ -12,9 +12,6 @@ def create_deck():
     shuffle(deck)
     return deck
 
-card_deck = create_deck()
-print(card_deck)
-
 class Player:
     def __init__(self, hand=[], money=100):
         self.hand = hand
@@ -61,10 +58,25 @@ class Player:
                 self.money += 2 * self.bet_amount
         self.bet_amount = 0
 
-player1 = Player(['3♣', '7♠', '5♢'], 200)
-player1.play(['A♠', 'K♢', '2♢'])
-player1.bet(20)
-player1.win(True)
+def print_house(house):
+    house_copy = house.hand[:]
+    house_copy[0] = 'X';
+    print(f'{", ".join(house_copy)}')
 
+card_deck = create_deck()
+first_hand = [card_deck.pop(), card_deck.pop()]
+second_hand = [card_deck.pop(), card_deck.pop()]
+player1 = Player(first_hand)
+house = Player(second_hand)
+print(card_deck)
+print_house(house)
 print(player1)
-print(player1.money)
+
+while(player1.score < 21):
+    action = input('Do you want to pick another card?(y/n): ')
+    if action.lower()[0] == 'y':
+        player1.hit(card_deck.pop())
+        print(player1)
+        print_house(house)
+    else:
+        break
